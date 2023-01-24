@@ -1,0 +1,11 @@
+{
+  "name": "simvideo",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "serve": "http-server ./out"
+  },
+  "author": "",
+  "license": "ISC"
+}
