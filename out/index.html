@@ -32,18 +32,27 @@
         <!-- timestamps -->
         <div class="flex flex-dir-col pv-30 bg-white">
           <div class="timestamp-container">
-            <form id="timestamp-form" class="flex gap-15 flex-wrap">
-              <div class="form-control">
-                <label for="start"><strong>Start time</strong></label>
-                <input type="text" name="start" required pattern="\d(\.\d+)?"/>
-              </div>
-              <div class="form-control">
-                <label for="end"><strong>End time</strong></label>
-                <input type="text" name="end" required pattern="\d(\.\d+)?"/>
-              </div>
-              <button class="button primary primary-hover" type="submit">Add</button>
-              <button class="button secondary secondary-hover" type="button" id="clear">Clear</button>
-            </form>
+            <div>
+              <h3>Trims</h3>
+              <h4>Add new timestamp</h4>
+              <form id="timestamp-form" class="flex gap-15 flex-wrap">
+                <div class="form-control">
+                  <label class="minw-140 inline-block" for="start"><strong>Start time</strong></label>
+                  <input id="start" disabled type="text" name="start" required pattern="\d(\.\d+)?"/>
+                </div>
+                <div class="form-control">
+                  <label class="minw-140 inline-block" for="end"><strong>End time</strong></label>
+                  <input id="end" disabled type="text" name="end" required pattern="\d(\.\d+)?"/>
+                </div>
+                <div class="w-100">
+                  <button id="add" disabled class="button primary primary-hover minw-140 disabled" type="submit">Add</button>
+                  <button id="clear" disabled class="button secondary secondary-hover minw-140 disabled" type="button">Clear</button>
+                </div>
+              </form>
+            </div>
+            <div>
+              <h4>Timestamps</h4>
+              <ul id="timestamp-list" class="list"></ul>
           </div>
         </div>
       </div>

@@ -53,6 +53,11 @@ html, body {
   align-items: center;
 }
 
+.pv-4 {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
 .pv-30 {
   padding-top: 30px;
   padding-bottom: 30px;
@@ -69,6 +74,22 @@ html, body {
 
 .w-90 {
   width: 90%;
+}
+
+.w-100 {
+  width: 100%;
+}
+
+.minw-140 {
+  min-width: 140px;
+}
+
+.minw-80 {
+  min-width: 80px;
+}
+
+.bold {
+  font-weight: bold;
 }
 
 .layout {
@@ -130,4 +151,8 @@ html, body {
 .disabled {
   background-color: #eee;
   color: #333;
+}
+
+.disabled:hover {
+  background-color: #eee;
 }
