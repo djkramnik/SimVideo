@@ -4,6 +4,7 @@
 
 const fileUpload = document.getElementById('file-upload')
 const video = document.getElementById('video')
+const videoOverlay = document.getElementById('video-overlay')
 const timestampForm = document.getElementById('timestamp-form')
 const timestampList = document.getElementById('timestamp-list')
 const startInput = document.getElementById('start')
@@ -11,12 +12,29 @@ const endInput = document.getElementById('end')
 const addBtn = document.getElementById('add')
 const clearBtn = document.getElementById('clear')
 
+const redBgStyle = 'background-color: rgba(240, 128, 128, 0.5);'
 const timestamps = []
 const removeBtnsAndHandlers = []
 
 clearBtn.addEventListener('click', clearForm, false)
 fileUpload.addEventListener('change', loadSelectedVideo, false)
 timestampForm.addEventListener('submit', handleTimestampSubmit, false)
+video.addEventListener('timeupdate', () => {
+  let showOverlay = false
+  for(let i = 0; i < timestamps.length; i++) {
+    if (
+      video.currentTime >= timestamps[i].start &&
+      video.currentTime <= timestamps[i].end) {
+      showOverlay = true
+      break
+    }
+  }
+  if (showOverlay && !videoOverlay.hasAttribute('style')) {
+    videoOverlay.setAttribute('style', redBgStyle)
+  } else if (!showOverlay && videoOverlay.hasAttribute('style')) {
+    videoOverlay.removeAttribute('style')
+  }
+}, false)
 
 function addToTimestamps({start, end}) {
   const timestamp = { start, end, id: Date.now() }

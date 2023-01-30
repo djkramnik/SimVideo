@@ -27,12 +27,6 @@ html, body {
   }
 }
 
-.video-container {
-  max-width: 1000px;
-  border: 1px solid #333;
-  aspect-ratio: 16/9;
-}
-
 .flex {
   display: flex;
 }
