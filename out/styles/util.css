@@ -37,6 +37,10 @@ html, body {
   display: flex;
 }
 
+.flex-wrap {
+  flex-wrap: wrap;
+}
+
 .flex-dir-col {
   flex-direction: column;
 }
@@ -106,4 +110,24 @@ html, body {
 
 .page {
   min-height: 100vh;
+}
+
+.primary {
+  background-color: #4CAF50;
+}
+.primary-hover:hover {
+  background-color: #059862;
+}
+
+.secondary {
+  background-color: #282A35;
+}
+
+.secondary-hover:hover {
+  background-color: #059862;
+}
+
+.disabled {
+  background-color: #eee;
+  color: #333;
 }

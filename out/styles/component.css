@@ -1,15 +1,14 @@
 .button {
   outline: none;
   border: none;
-  width: 200px;
   padding: 12px;
-  background-color: #4CAF50;
   text-align: center;
   cursor: pointer;
   font-weight: bold;
   color: #fff;
 }
 
-.button:hover {
-  background-color: #059862;
+.video {
+  width: 100%;
+  height: 100%;
 }
