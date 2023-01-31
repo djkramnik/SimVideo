@@ -9,8 +9,10 @@ app.use((_, res, next) => {
 
 app.use(express.static('out'));
 
-const PORT = process.env.PORT || 8080;
+const PORT = process.env.PORT || 3000
 
 app.listen(PORT, () => {
   console.log(`Server listening on port ${PORT}...`);
 });
+
+// https://stackoverflow.com/questions/60361177/ffmpeg-trim-combine-multiple-sections-of-same-video-with-precise-timestamps

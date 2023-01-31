@@ -54,10 +54,28 @@
             <div>
               <h4>Timestamps</h4>
               <ul id="timestamp-list" class="list"></ul>
+            </div>
+            <div>
+              <button
+                id="export"
+                disabled
+                class="button primary primary-hover minw-140 disabled"
+              >
+                Export
+              </button>
+            </div>
           </div>
         </div>
       </div>
     </div>
+    <script src="/static/js/ffmpeg.min.js"></script>
+    <script>
+      const { createFFmpeg, fetchFile } = FFmpeg;
+      const ffmpeg = createFFmpeg({
+        corePath: 'static/js/ffmpeg-core.js'
+      });
+      console.log(ffmpeg.load, typeof fetchFile)
+    </script>
     <script src="index.js" type="text/javascript"></script>
   </body>
 </html>

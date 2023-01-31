@@ -11,11 +11,25 @@ const startInput = document.getElementById('start')
 const endInput = document.getElementById('end')
 const addBtn = document.getElementById('add')
 const clearBtn = document.getElementById('clear')
+const exportBtn = document.getElementById('export')
 
+let uploadedFile = null
+const inFilename = ''
 const redBgStyle = 'background-color: rgba(240, 128, 128, 0.5);'
 const timestamps = []
 const removeBtnsAndHandlers = []
 
+exportBtn.addEventListener('click', () => {
+  if (!uploadedFile) {
+    window.alert('No file selected')
+    return
+  }
+  if (timestamps.length === 0) {
+    window.alert('No timestamps added')
+    return
+  }
+
+}, false)
 clearBtn.addEventListener('click', clearForm, false)
 fileUpload.addEventListener('change', loadSelectedVideo, false)
 timestampForm.addEventListener('submit', handleTimestampSubmit, false)
@@ -35,6 +49,23 @@ video.addEventListener('timeupdate', () => {
     videoOverlay.removeAttribute('style')
   }
 }, false)
+
+async function exportVideo() {
+  if (!uploadedFile) {
+    window.alert('No file selected')
+    return
+  }
+  if (timestamps.length === 0) {
+    window.alert('No timestamps added')
+    return
+  }
+  if (!ffmpeg.isLoaded()) {
+    await ffmpeg.load();
+  }
+  // ffmpeg.FS('writeFile', inFilename, await fetchFile(file));
+  // await ffmpeg.run(...[]);
+  console.log('go rogue', inFilename)
+}
 
 function addToTimestamps({start, end}) {
   const timestamp = { start, end, id: Date.now() }
@@ -81,8 +112,9 @@ function handleTimestampSubmit(event) {
       timestampList.children[index],
     )
   }
+  exportBtn.disabled = false
+  exportBtn.classList.remove('disabled')
   
-  console.log('timestamps', timestamps)
   clearForm()
 }
 
@@ -93,10 +125,18 @@ function cleanUpTimestamps() {
   })
   removeBtnsAndHandlers.splice(0, removeBtnsAndHandlers.length)
   timestampList.innerHTML = ''
+  exportBtn.disabled = true
+  exportBtn.classList.add('disabled')
 }
 
 function loadSelectedVideo(event) {
   const file = event.target.files[0]
+  inFilename = file.name
+  console.log('name', inFilename)
+  readFromBlobOrFile(file)
+    .then((result) => {
+      uploadedFile = new Uint8Array(result)
+    })
   if (!video.canPlayType(file.type)) {
     window.alert('Cannot play this file')
     return
@@ -116,6 +156,21 @@ function loadSelectedVideo(event) {
   if (timestamps.length > 0) {
     cleanUpTimestamps()
   }
+}
+
+function readFromBlobOrFile(blob) {
+  return (
+    new Promise((resolve, reject) => {
+      const fileReader = new FileReader();
+      fileReader.onload = () => {
+        resolve(fileReader.result);
+      };
+      fileReader.onerror = ({ target: { error: { code } } }) => {
+        reject(Error(`File could not be read! Code=${code}`));
+      };
+      fileReader.readAsArrayBuffer(blob);
+    })
+  )
 }
 
 function createTimestampDom(timestamp) {
@@ -146,6 +201,10 @@ function createTimestampDom(timestamp) {
     removeBtn.removeEventListener('click', remove)
     removeBtnsAndHandlers.splice(removeBtnsAndHandlers.findIndex(r => r.btn === removeBtn), 1)
     console.log('timestamps', timestamps)
+    if (timestamps.length === 0) {
+      exportBtn.disabled = true
+      exportBtn.classList.add('disabled')
+    }
   }
 
   removeBtnsAndHandlers.push({
