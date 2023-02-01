@@ -116,6 +116,20 @@ function handleTimestampSubmit(event) {
     window.alert('Start must be less than end')
     return
   }
+  
+  // prevent overlapping timestamps
+  for(let i = 0; i < timestamps.length; i++) {
+    if (start >= timestamps[i].start && start <= timestamps[i].end) {
+      window.alert('Start time overlaps with another timestamp')
+      return
+    }
+
+    if (end >= timestamps[i].start && end <= timestamps[i].end) {
+      window.alert('End time overlaps with another timestamp')
+      return
+    }
+  }
+
   const { timestamp, index } = addToTimestamps({ start, end })
   const dom = createTimestampDom(timestamp)
   if (index === -1) {
