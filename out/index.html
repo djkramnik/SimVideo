@@ -72,8 +72,9 @@
     <script>
       const { createFFmpeg, fetchFile } = FFmpeg;
       const ffmpeg = createFFmpeg({
-        corePath: 'static/js/ffmpeg-core.js',
+        corePath: 'https://unpkg.com/@ffmpeg/core@0.11.0/dist/ffmpeg-core.js',
         log: true,
+        mainName: 'proxy_main'
       });
       console.log(ffmpeg.load, typeof fetchFile)
     </script>

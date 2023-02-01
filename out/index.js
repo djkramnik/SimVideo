@@ -55,13 +55,12 @@ async function exportVideo() {
     if (!ffmpeg.isLoaded()) {
       await ffmpeg.load();
     }
-    ffmpeg.FS('writeFile', inFilename, await fetchFile(file));
+    ffmpeg.FS('writeFile', inFilename, await fetchFile(uploadedFile));
     const outFilename = 'out.mp4';
     const args = [
       '-i',
       inFilename,
       '-filter_complex',
-      '-c:v',
       '[0:v]trim=start=00.000:end=10.000[av];[0:v]trim=start=20.000:end=30.000,setpts=PTS-STARTPTS[bv];[0:v]trim=start=40.000:end=50.000,setpts=PTS-STARTPTS[dv];[0:a]atrim=start=00.000:end=10.000[aa];[0:a]atrim=start=20.000:end=30.000,asetpts=PTS-STARTPTS[ba];[0:a]atrim=start=40.000:end=50.000,asetpts=PTS-STARTPTS[da];[av][bv]concat[cv];[aa][ba]concat=v=0:a=1[ca];[cv][dv]concat[outv];[ca][da]concat=v=0:a=1[outa]',
       '-map',
       '[outv]',
@@ -75,6 +74,7 @@ async function exportVideo() {
     video.src = URL.createObjectURL(new Blob([data.buffer], { type: 'video/mp4' }))
   } catch(e) {
     window.alert('could not export video')
+    console.log('why god', e)
   } finally {
     exportBtn.disabled = false
     exportBtn.classList.remove('disabled')
