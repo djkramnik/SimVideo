@@ -72,7 +72,8 @@
     <script>
       const { createFFmpeg, fetchFile } = FFmpeg;
       const ffmpeg = createFFmpeg({
-        corePath: 'static/js/ffmpeg-core.js'
+        corePath: 'static/js/ffmpeg-core.js',
+        log: true,
       });
       console.log(ffmpeg.load, typeof fetchFile)
     </script>

@@ -14,22 +14,12 @@ const clearBtn = document.getElementById('clear')
 const exportBtn = document.getElementById('export')
 
 let uploadedFile = null
-const inFilename = ''
+let inFilename = ''
 const redBgStyle = 'background-color: rgba(240, 128, 128, 0.5);'
 const timestamps = []
 const removeBtnsAndHandlers = []
 
-exportBtn.addEventListener('click', () => {
-  if (!uploadedFile) {
-    window.alert('No file selected')
-    return
-  }
-  if (timestamps.length === 0) {
-    window.alert('No timestamps added')
-    return
-  }
-
-}, false)
+exportBtn.addEventListener('click', exportVideo, false)
 clearBtn.addEventListener('click', clearForm, false)
 fileUpload.addEventListener('change', loadSelectedVideo, false)
 timestampForm.addEventListener('submit', handleTimestampSubmit, false)
@@ -51,20 +41,44 @@ video.addEventListener('timeupdate', () => {
 }, false)
 
 async function exportVideo() {
-  if (!uploadedFile) {
-    window.alert('No file selected')
-    return
+  try {
+    exportBtn.disabled = true
+    exportBtn.classList.add('disabled')
+    if (!uploadedFile) {
+      window.alert('No file selected')
+      return
+    }
+    if (timestamps.length === 0) {
+      window.alert('No timestamps added')
+      return
+    }
+    if (!ffmpeg.isLoaded()) {
+      await ffmpeg.load();
+    }
+    ffmpeg.FS('writeFile', inFilename, await fetchFile(file));
+    const outFilename = 'out.mp4';
+    const args = [
+      '-i',
+      inFilename,
+      '-filter_complex',
+      '-c:v',
+      '[0:v]trim=start=00.000:end=10.000[av];[0:v]trim=start=20.000:end=30.000,setpts=PTS-STARTPTS[bv];[0:v]trim=start=40.000:end=50.000,setpts=PTS-STARTPTS[dv];[0:a]atrim=start=00.000:end=10.000[aa];[0:a]atrim=start=20.000:end=30.000,asetpts=PTS-STARTPTS[ba];[0:a]atrim=start=40.000:end=50.000,asetpts=PTS-STARTPTS[da];[av][bv]concat[cv];[aa][ba]concat=v=0:a=1[ca];[cv][dv]concat[outv];[ca][da]concat=v=0:a=1[outa]',
+      '-map',
+      '[outv]',
+      '-map',
+      '[outa]',
+      outFilename,
+    ]
+    await ffmpeg.run(...args);
+  
+    const data = ffmpeg.FS('readFile', outFilename);
+    video.src = URL.createObjectURL(new Blob([data.buffer], { type: 'video/mp4' }))
+  } catch(e) {
+    window.alert('could not export video')
+  } finally {
+    exportBtn.disabled = false
+    exportBtn.classList.remove('disabled')
   }
-  if (timestamps.length === 0) {
-    window.alert('No timestamps added')
-    return
-  }
-  if (!ffmpeg.isLoaded()) {
-    await ffmpeg.load();
-  }
-  // ffmpeg.FS('writeFile', inFilename, await fetchFile(file));
-  // await ffmpeg.run(...[]);
-  console.log('go rogue', inFilename)
 }
 
 function addToTimestamps({start, end}) {
@@ -132,11 +146,12 @@ function cleanUpTimestamps() {
 function loadSelectedVideo(event) {
   const file = event.target.files[0]
   inFilename = file.name
-  console.log('name', inFilename)
+
   readFromBlobOrFile(file)
     .then((result) => {
       uploadedFile = new Uint8Array(result)
     })
+  
   if (!video.canPlayType(file.type)) {
     window.alert('Cannot play this file')
     return
@@ -200,7 +215,7 @@ function createTimestampDom(timestamp) {
     timestamps.splice(timestamps.findIndex(t => t.id === id), 1)
     removeBtn.removeEventListener('click', remove)
     removeBtnsAndHandlers.splice(removeBtnsAndHandlers.findIndex(r => r.btn === removeBtn), 1)
-    console.log('timestamps', timestamps)
+
     if (timestamps.length === 0) {
       exportBtn.disabled = true
       exportBtn.classList.add('disabled')
