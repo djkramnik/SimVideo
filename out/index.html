@@ -1,7 +1,7 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
   <head>
-    <meta charset="utf-8">
+    <meta charset="utf-8" />
     <title>Sim Video</title>
     <link href="/styles/util.css" type="text/css" rel="stylesheet" />
     <link href="/styles/component.css" type="text/css" rel="stylesheet" />
@@ -10,7 +10,11 @@
     <header class="dark">
       <div class="container flex aic gap-15">
         <h2 class="inline-block mr-10">Sim Video</h2>
-        <img class="logo" src="/assets/teacup.jpg" alt="logo of watercolour teacup" />
+        <img
+          class="logo"
+          src="/assets/teacup.jpg"
+          alt="logo of watercolour teacup"
+        />
       </div>
     </header>
     <div class="page container">
@@ -26,9 +30,12 @@
             <div class="video-timeline"></div>
           </div> -->
           <hr class="separator" />
-          <input id="file-upload"
+          <input
+            id="file-upload"
             class="button primary primary-hover"
-            type="file" accept="video/*" />
+            type="file"
+            accept="video/*"
+          />
         </div>
         <!-- timestamps -->
         <div class="flex flex-dir-col pv-30 bg-white">
@@ -38,16 +45,48 @@
               <h4>Add new timestamp</h4>
               <form id="timestamp-form" class="flex gap-15 flex-wrap">
                 <div class="form-control">
-                  <label class="minw-140 inline-block" for="start"><strong>Start time</strong></label>
-                  <input id="start" disabled type="text" name="start" required pattern="\d+(\.\d+)?"/>
+                  <label class="minw-140 inline-block" for="start"
+                    ><strong>Start time</strong></label
+                  >
+                  <input
+                    id="start"
+                    disabled
+                    type="text"
+                    name="start"
+                    required
+                    pattern="\d+(\.\d+)?"
+                  />
                 </div>
                 <div class="form-control">
-                  <label class="minw-140 inline-block" for="end"><strong>End time</strong></label>
-                  <input id="end" disabled type="text" name="end" required pattern="\d+(\.\d+)?"/>
+                  <label class="minw-140 inline-block" for="end"
+                    ><strong>End time</strong></label
+                  >
+                  <input
+                    id="end"
+                    disabled
+                    type="text"
+                    name="end"
+                    required
+                    pattern="\d+(\.\d+)?"
+                  />
                 </div>
                 <div class="w-100">
-                  <button id="add" disabled class="button primary primary-hover minw-140 disabled" type="submit">Add</button>
-                  <button id="clear" disabled class="button secondary secondary-hover minw-140 disabled" type="button">Clear</button>
+                  <button
+                    id="add"
+                    disabled
+                    class="button primary primary-hover minw-140 disabled"
+                    type="submit"
+                  >
+                    Add
+                  </button>
+                  <button
+                    id="clear"
+                    disabled
+                    class="button secondary secondary-hover minw-140 disabled"
+                    type="button"
+                  >
+                    Clear
+                  </button>
                 </div>
               </form>
             </div>
@@ -70,12 +109,13 @@
     </div>
     <script src="/static/js/ffmpeg.min.js"></script>
     <script>
-      const { createFFmpeg, fetchFile } = FFmpeg;
+      const { createFFmpeg, fetchFile } = FFmpeg
       const ffmpeg = createFFmpeg({
-        corePath: 'https://unpkg.com/@ffmpeg/core@0.11.0/dist/ffmpeg-core.js',
+        // corePath: 'https://unpkg.com/@ffmpeg/core@0.11.0/dist/ffmpeg-core.js',
+        corePath: new URL('static/js/ffmpeg-core.js', document.location).href,
         log: true,
         mainName: 'proxy_main'
-      });
+      })
       console.log(ffmpeg.load, typeof fetchFile)
     </script>
     <script src="index.js" type="text/javascript"></script>
