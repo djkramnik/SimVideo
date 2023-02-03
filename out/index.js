@@ -40,43 +40,22 @@ video.addEventListener('timeupdate', () => {
   }
 }, false)
 
-const experiment = ["[0:v]trim=start=0:end=10.000[av]",
-"[0:v]trim=start=20:end=30.000,setpts=PTS-STARTPTS[bv]",
-"[0:v]trim=start=40.000:end=50.000,setpts=PTS-STARTPTS[dv]",
-"[0:v]trim=start=60:end=70,setpts=PTS-STARTPTS[ev]",
-"[0:a]atrim=start=00.000:end=10.000[aa]",
-"[0:a]atrim=start=20.000:end=30.000,asetpts=PTS-STARTPTS[ba]",
-"[0:a]atrim=start=40.000:end=50.000,asetpts=PTS-STARTPTS[da]",
-"[0:a]atrim=start=60:end=70,setpts=PTS-STARTPTS[ea]",
-"[av][bv]concat[cv]",
-"[aa][ba]concat=v=0:a=1[ca]",
-"[cv][dv]concat[fv]",
-"[ca][da]concat=v=0:a=1[fa]",
-"[fv][ev]concat[outv]",
-"[fa][ea]concat=v=0:a=1[outa]"]
-// remove-multiple-tracks
-// const experiment2 = `[0:v]trim=start=10:end=20[a];[0:v]trim=start=40:end=50,setpts=PTS-STARTPTS[b];
-// [a][b]concat[c];[0:v]trim=start=80:end=90,setpts=PTS-STARTPTS[d];[c][d]concat[e];[0:v]trim=start=110:end=120,setpts=PTS-STARTPTS[f];
-// [e][f]concat[outv]`
-
 const experiment2 = [
-  '[0:v]trim=start=10:end=20[va]',
-  '[0:a]atrim=start=10:end=20[aa]',
-  '[0:v]trim=start=40:end=50,setpts=PTS-STARTPTS[vb]',
-  '[0:a]atrim=start=40:end=50,setpts=PTS-STARTPTS[ab]',
-  '[va][vb]concat[vc]',
-  '[aa][ab]concat=v:0:a=1[ac]',
-  '[0:v]trim=start=80:end=90,setpts=PTS-STARTPTS[vd]',
-  '[0:a]atrim=start=80:end=90,setpts=PTS-STARTPTS[ad]',
-  '[vc][vd]concat[ve]',
-  '[ac][ad]concat=v:0:a=1[ae]',
-  '[0:v]trim=start=110:end=120,setpts=PTS-STARTPTS[vf]',
-  '[ve][vf]concat[outv]',
-  '[0:a]atrim=start=110:end=120,setpts=PTS-STARTPTS[af]',
-  '[ae][af]concat=v:0:a=1[outa]',
+  '[0:v]trim=start=0:end=10.000[av]',
+  '[0:v]trim=start=20:end=30.000,setpts=PTS-STARTPTS[bv]',
+  '[0:v]trim=start=40.000:end=50.000,setpts=PTS-STARTPTS[cv]',
+  '[0:v]trim=start=60.000:end=70.000,setpts=PTS-STARTPTS[dv]',
+  '[0:a]atrim=start=00.000:end=10.000[aa]',
+  '[0:a]atrim=start=20.000:end=30.000,asetpts=PTS-STARTPTS[ba]',
+  '[0:a]atrim=start=40.000:end=50.000,asetpts=PTS-STARTPTS[ca]',
+  '[0:a]atrim=start=60.000:end=70.000,asetpts=PTS-STARTPTS[da]',
+  '[av][bv]concat[abv]',
+  '[aa][ba]concat=v=0:a=1[aba]',
+  '[abv][cv]concat[abcv]',
+  '[aba][ca]concat=v=0:a=1[abca]',
+  '[abcv][dv]concat[outv]',
+  '[abca][da]concat=v=0:a=1[outa]'
 ].join(';')
-
-console.log('hey daddio', experiment.join(';'))
 
 function getFilterFromSegments(segments) {
   const [videoStr, audioStr ] = segments.reduce((acc, {start, end}) => {
@@ -130,8 +109,6 @@ async function exportVideo() {
       inFilename,
       '-filter_complex',
       experiment2,
-      // experiment.join(';'),
-      // '[0:v]trim=start=0:end=10.000[av];[0:v]trim=start=20:end=30.000,setpts=PTS-STARTPTS[bv];[0:v]trim=start=40.000:end=50.000,setpts=PTS-STARTPTS[dv];[0:a]atrim=start=00.000:end=10.000[aa];[0:a]atrim=start=20.000:end=30.000,asetpts=PTS-STARTPTS[ba];[0:a]atrim=start=40.000:end=50.000,asetpts=PTS-STARTPTS[da];[av][bv]concat[cv];[aa][ba]concat=v=0:a=1[ca];[cv][dv]concat[outv];[ca][da]concat=v=0:a=1[outa]',
       '-map',
       '[outv]',
       '-map',
