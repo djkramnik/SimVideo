@@ -40,6 +40,10 @@ video.addEventListener('timeupdate', () => {
   }
 }, false)
 
+const alphabet = ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']
+
+
+
 const experiment2 = [
   '[0:v]trim=start=0:end=10.000[av]',
   '[0:v]trim=start=20:end=30.000,setpts=PTS-STARTPTS[bv]',
@@ -57,8 +61,20 @@ const experiment2 = [
   '[abca][da]concat=v=0:a=1[outa]'
 ].join(';')
 
+function getSegmentCode(i, type) {
+  return new Array(Math.floor(i / alphabet.length) + 1).fill(alphabet[i % alphabet.length]).join('') + type
+}
+
+function getSegment(start, end, i) {
+  return {
+    start,
+    end,
+    id: Date.now(),
+  }
+}
+
 function getFilterFromSegments(segments) {
-  const [videoStr, audioStr ] = segments.reduce((acc, {start, end}) => {
+  const [videoStr, audioStr ] = segments.reduce((acc, {start, end}, index) => {
 
   }, { video: '', audio: '' })
   return videoStr + audioStr
