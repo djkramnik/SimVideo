@@ -42,49 +42,81 @@ video.addEventListener('timeupdate', () => {
 
 const alphabet = ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']
 
-
-
-const experiment2 = [
-  '[0:v]trim=start=0:end=10.000[av]',
-  '[0:v]trim=start=20:end=30.000,setpts=PTS-STARTPTS[bv]',
-  '[0:v]trim=start=40.000:end=50.000,setpts=PTS-STARTPTS[cv]',
-  '[0:v]trim=start=60.000:end=70.000,setpts=PTS-STARTPTS[dv]',
-  '[0:a]atrim=start=00.000:end=10.000[aa]',
-  '[0:a]atrim=start=20.000:end=30.000,asetpts=PTS-STARTPTS[ba]',
-  '[0:a]atrim=start=40.000:end=50.000,asetpts=PTS-STARTPTS[ca]',
-  '[0:a]atrim=start=60.000:end=70.000,asetpts=PTS-STARTPTS[da]',
-  '[av][bv]concat[abv]',
-  '[aa][ba]concat=v=0:a=1[aba]',
-  '[abv][cv]concat[abcv]',
-  '[aba][ca]concat=v=0:a=1[abca]',
-  '[abcv][dv]concat[outv]',
-  '[abca][da]concat=v=0:a=1[outa]'
-].join(';')
-
 function getSegmentCode(i, type) {
   return new Array(Math.floor(i / alphabet.length) + 1).fill(alphabet[i % alphabet.length]).join('') + type
 }
 
-function getSegment(start, end, i) {
+function getVideoSegmentStr({ start, end, index }) {
+  return `[0:v]trim=start=${start}:end=${end},setpts=PTS-STARTPTS[${getSegmentCode(index, 'v')}]`
+}
+
+function getAudioSegmentStr({ start, end, index }) {
+  return `[0:a]atrim=start=${start}:end=${end},asetpts=PTS-STARTPTS[${getSegmentCode(index, 'a')}]`
+}
+
+function getFilterStrFromSegments(segments) {
+  const { video, audio } = segments.reduce((acc, {start, end}, index) => {
+    return {
+      video: acc.video.concat(getVideoSegmentStr({ start, end, index })),
+      audio: acc.audio.concat(getAudioSegmentStr({ start, end, index })),
+    }
+  }, { video: [], audio: [] })
+  
+  return video.join(';').concat(audio.join(';'))
+}
+
+function concatSegmentCodes(code1, code2, type) {
+  return code1.slice(0, code1.length - 1) + code2.slice(0, code2.length - 1) + type
+}
+
+function getConcatStr(segmentsLength) {
+  if (segmentsLength < 2) {
+    return {
+      concatStr: '',
+      concatVideoStr: 'av',
+      concatAudioStr: 'aa',
+    }
+  }
+
+  let concatStrArr = [
+    '[av][bv]concat[abv]',
+    '[aa][ba]concat=v=0:a=1[aba]',
+  ]
+
+  let concatVideoStr = 'abv'
+  let concatAudioStr = 'aba'
+
+  for(let i = 2; i < segmentsLength; i += 1) {
+    const nextVideoSegmentCode = getSegmentCode(i, 'v')
+    const nextConcatVideoStr = i < segmentsLength - 1
+      ? concatSegmentCodes(concatVideoStr, nextVideoSegmentCode, 'v')
+      : 'outv'
+
+    const nextAudioSegmentCode = getSegmentCode(i, 'a')
+    const nextConcatAudioStr = i < segmentsLength - 1
+      ? concatSegmentCodes(concatAudioStr, nextAudioSegmentCode, 'a')
+      : 'outa'
+
+    concatStrArr = concatStrArr.concat(
+      `[${concatVideoStr}][${nextVideoSegmentCode}]concat[${nextConcatVideoStr}]`,
+      `[${concatAudioStr}][${nextAudioSegmentCode}]concat=v=0:a=1[${nextConcatAudioStr}]`,
+      )
+    
+    concatVideoStr = nextConcatVideoStr
+    concatAudioStr = nextConcatAudioStr
+  }
   return {
-    start,
-    end,
-    id: Date.now(),
+    concatStr: concatStrArr.join(';'),
+    concatVideoStr,
+    concatAudioStr,
   }
 }
 
-function getFilterFromSegments(segments) {
-  const [videoStr, audioStr ] = segments.reduce((acc, {start, end}, index) => {
-
-  }, { video: '', audio: '' })
-  return videoStr + audioStr
-}
-
-function getSegments() {
+function getSegments(timestamps) {
   const segments = []
   let lastTime = 0
   for(let i = 0; i < timestamps.length; i++) {
-    const { tsStart, tsEnd } = timestamps[i]
+    const { start: tsStart, end: tsEnd } = timestamps[i]
     if (tsStart > 0) {
       segments.push({
         start: lastTime,
@@ -101,6 +133,19 @@ function getSegments() {
     }
   }
   return segments
+}
+
+function getComplexFFmpegArgs() {
+  const segments = getSegments(timestamps)
+  const filterStr = getFilterStrFromSegments(segments)
+  const { concatStr, concatVideoStr, concatAudioStr } = getConcatStr(segments.length)
+  return [
+    `${filterStr};${concatStr}`,
+    '-map',
+    `[${concatVideoStr}]`,
+    '-map',
+    `[${concatAudioStr}]`,
+  ]
 }
 
 async function exportVideo() {
@@ -124,11 +169,7 @@ async function exportVideo() {
       '-i',
       inFilename,
       '-filter_complex',
-      experiment2,
-      '-map',
-      '[outv]',
-      '-map',
-      '[outa]',
+      ...getComplexFFmpegArgs(),
       outFilename,
     ]
     await ffmpeg.run(...args);
