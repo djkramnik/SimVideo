@@ -62,7 +62,7 @@ function getFilterStrFromSegments(segments) {
     }
   }, { video: [], audio: [] })
   
-  return video.join(';').concat(audio.join(';'))
+  return video.concat(audio).join(';')
 }
 
 function concatSegmentCodes(code1, code2, type) {
@@ -165,13 +165,17 @@ async function exportVideo() {
     }
     ffmpeg.FS('writeFile', inFilename, await fetchFile(uploadedFile));
     const outFilename = 'out.mp4';
+
+    const complexArgs = getComplexFFmpegArgs()
+    console.log('test', complexArgs)
     const args = [
       '-i',
       inFilename,
       '-filter_complex',
-      ...getComplexFFmpegArgs(),
+      ...complexArgs,
       outFilename,
     ]
+
     await ffmpeg.run(...args);
   
     const data = ffmpeg.FS('readFile', outFilename);
