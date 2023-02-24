@@ -156,11 +156,27 @@ function getSegments(timestamps) {
   return segments
 }
 
+function getSimpleFFmpegArgs() {
+  const {start, end} = timestamps[0]
+  return [
+    '-ss',
+    start,
+    '-to',
+    end,
+    '-c:v',
+    'copy',
+    '-c:a',
+    'copy'
+  ]
+}
+
 function getComplexFFmpegArgs() {
-  const segments = getSegments(timestamps)
+  // const segments = getSegments(timestamps)
+  const segments = timestamps.slice(0)
   const filterStr = getFilterStrFromSegments(segments)
   const { concatStr, concatVideoStr, concatAudioStr } = getConcatStr(segments.length)
   return [
+    '-filter_complex',
     `${filterStr};${concatStr}`,
     '-map',
     `[${concatVideoStr}]`,
@@ -187,12 +203,15 @@ async function exportVideo() {
     ffmpeg.FS('writeFile', inFilename, await fetchFile(uploadedFile));
     const outFilename = 'out.mp4';
 
-    const complexArgs = getComplexFFmpegArgs()
+
+    const dynamicArgs = timestamps.length > 1
+      ? getComplexFFmpegArgs()
+      : getSimpleFFmpegArgs()
+
     const args = [
       '-i',
       inFilename,
-      '-filter_complex',
-      ...complexArgs,
+      ...dynamicArgs,
       outFilename,
     ]
 
