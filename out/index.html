@@ -25,10 +25,15 @@
             <video class="video" id="video" controls></video>
             <div id="video-overlay" class="video-overlay"></div>
           </div>
-          <!-- <hr class="separator" />
-          <div class="video-timeline-container">
-            <div class="video-timeline"></div>
-          </div> -->
+          <hr class="separator" />
+          <div class="flex aic">
+            <p id="current-time-container" class="m0 mr-10">
+              Current time:
+            </p>
+            <p style="width: 80px" id="current-time-value" class="mr-40"></p>
+            <button id="copy-start" class="mr-10">Copy to start</button>
+            <button id="copy-end">Copy to end</button>
+          </div>
           <hr class="separator" />
           <input
             id="file-upload"
@@ -41,8 +46,8 @@
         <div class="flex flex-dir-col pv-30 bg-white">
           <div class="timestamp-container">
             <div>
-              <h3>Trims</h3>
-              <h4>Add new timestamp</h4>
+              <!-- <h3>Segments</h3> -->
+              <h4>Add new segment</h4>
               <form id="timestamp-form" class="flex gap-15 flex-wrap">
                 <div class="form-control">
                   <label class="minw-140 inline-block" for="start"
@@ -69,6 +74,8 @@
                     required
                     pattern="\d+(\.\d+)?"
                   />
+
+                  <button type="button" id="to-end-btn">To End</button>
                 </div>
                 <div class="w-100">
                   <button
@@ -91,7 +98,7 @@
               </form>
             </div>
             <div>
-              <h4>Timestamps</h4>
+              <h4>Segments</h4>
               <ul id="timestamp-list" class="list"></ul>
             </div>
             <div>

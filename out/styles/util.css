@@ -62,6 +62,18 @@ html, body {
   background: #333;
 }
 
+.m0 {
+  margin: 0;
+}
+
+.mr-10 {
+  margin-right: 10px;
+}
+
+.mr-40 {
+  margin-right: 40px;
+}
+
 .m-auto {
   margin: 0 auto;
 }

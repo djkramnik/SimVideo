@@ -12,6 +12,10 @@ const endInput = document.getElementById('end')
 const addBtn = document.getElementById('add')
 const clearBtn = document.getElementById('clear')
 const exportBtn = document.getElementById('export')
+const currentTime = document.getElementById('current-time-value')
+const copyStart = document.getElementById('copy-start')
+const copyEnd = document.getElementById('copy-end')
+const toEnd = document.getElementById('to-end-btn')
 
 let uploadedFile = null
 let inFilename = ''
@@ -23,8 +27,25 @@ exportBtn.addEventListener('click', exportVideo, false)
 clearBtn.addEventListener('click', clearForm, false)
 fileUpload.addEventListener('change', loadSelectedVideo, false)
 timestampForm.addEventListener('submit', handleTimestampSubmit, false)
+copyStart.addEventListener('click', () => {
+  if (!startInput.disabled) {
+    startInput.value = video.currentTime 
+  }
+}, false)
+copyEnd.addEventListener('click', () => {
+  if (!endInput.disabled) {
+    endInput.value = video.currentTime 
+  }
+}, false)
+toEnd.addEventListener('click', () => {
+  if (!endInput.disabled) {
+    endInput.value = video.duration
+  }
+})
+
 video.addEventListener('timeupdate', () => {
   let showOverlay = false
+  currentTime.innerHTML = video.currentTime
   for(let i = 0; i < timestamps.length; i++) {
     if (
       video.currentTime >= timestamps[i].start &&
@@ -167,7 +188,6 @@ async function exportVideo() {
     const outFilename = 'out.mp4';
 
     const complexArgs = getComplexFFmpegArgs()
-    console.log('test', complexArgs)
     const args = [
       '-i',
       inFilename,
