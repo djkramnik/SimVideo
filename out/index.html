@@ -114,6 +114,26 @@
         </div>
       </div>
     </div>
+    <div id="modal-container" class="flex hidden">
+      <div id="modal" class="p-24">
+        <form class="container">
+          <h3>Preview</h3>
+          <div class="relative">
+            <div id="preview-overlay" class="absolute overlay flex" style="z-index:1">
+              <button id="play-button" type="button">
+                <img src="/assets/play-button.png" />
+              </button>
+            </div>
+            <video id="modal-preview" class="video border"></video>
+          </div>
+          <div class="pv-30"></div>
+          <div class="flex flex-dir-rr w-80 m-auto gap-15">
+            <button id="modal-submit" class="button" type="submit">Confirm</button>
+            <button id="modal-cancel" class="button" type="button">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </div>
     <script src="/static/js/ffmpeg.min.js"></script>
     <script>
       const { createFFmpeg, fetchFile } = FFmpeg

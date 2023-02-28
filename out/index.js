@@ -16,13 +16,20 @@ const currentTime = document.getElementById('current-time-value')
 const copyStart = document.getElementById('copy-start')
 const copyEnd = document.getElementById('copy-end')
 const toEnd = document.getElementById('to-end-btn')
+const modal = document.getElementById('modal')
+const playBtn = document.getElementById('play-button')
+const previewOverlay = document.getElementById('preview-overlay')
+const modalPreview = document.getElementById('modal-preview')
+const modalContainer = document.getElementById('modal-container')
 
 let uploadedFile = null
 let inFilename = ''
-const redBgStyle = 'background-color: rgba(240, 128, 128, 0.5);'
+const greenBgStyle = 'background-color: rgba(0, 128, 0, 0.5);'
 const timestamps = []
 const removeBtnsAndHandlers = []
+let currentTimestampIndex = -1
 
+playBtn.addEventListener('click', playPreview, false)
 exportBtn.addEventListener('click', exportVideo, false)
 clearBtn.addEventListener('click', clearForm, false)
 fileUpload.addEventListener('change', loadSelectedVideo, false)
@@ -55,7 +62,7 @@ video.addEventListener('timeupdate', () => {
     }
   }
   if (showOverlay && !videoOverlay.hasAttribute('style')) {
-    videoOverlay.setAttribute('style', redBgStyle)
+    videoOverlay.setAttribute('style', greenBgStyle)
   } else if (!showOverlay && videoOverlay.hasAttribute('style')) {
     videoOverlay.removeAttribute('style')
   }
@@ -156,13 +163,17 @@ function getSegments(timestamps) {
   return segments
 }
 
+function secsToTime(secs) {
+  return [secs/3600|0, (secs%3600)/60|0, secs%60].map(n=>(n<10?'0':'')+n).join(':');
+}
+
 function getSimpleFFmpegArgs() {
   const {start, end} = timestamps[0]
   return [
     '-ss',
-    start,
+    secsToTime(start),
     '-to',
-    end,
+    secsToTime(end),
     '-c:v',
     'copy',
     '-c:a',
@@ -186,17 +197,23 @@ function getComplexFFmpegArgs() {
 }
 
 async function exportVideo() {
+  exportBtn.disabled = true
+  exportBtn.classList.add('disabled')
+  if (!uploadedFile) {
+    window.alert('No file selected')
+    return
+  }
+  if (timestamps.length === 0) {
+    window.alert('No timestamps added')
+    return
+  }
+  modalContainer.classList.remove('hidden')
+  modalPreview.src = video.src
+  modalPreview.currentTime = timestamps[0].start
+}
+
+async function processVideo() {
   try {
-    exportBtn.disabled = true
-    exportBtn.classList.add('disabled')
-    if (!uploadedFile) {
-      window.alert('No file selected')
-      return
-    }
-    if (timestamps.length === 0) {
-      window.alert('No timestamps added')
-      return
-    }
     if (!ffmpeg.isLoaded()) {
       await ffmpeg.load();
     }
@@ -216,7 +233,7 @@ async function exportVideo() {
     ]
 
     await ffmpeg.run(...args);
-  
+
     const data = ffmpeg.FS('readFile', outFilename);
     video.src = URL.createObjectURL(new Blob([data.buffer], { type: 'video/mp4' }))
   } catch(e) {
@@ -393,5 +410,29 @@ function createTimestampDom(timestamp) {
   })
   
   return li
+}
+
+function playPreview() {
+  previewOverlay.classList.add('hidden')
+  modalPreview.addEventListener('timeupdate', previewHandler)
+  playBtn.removeEventListener('click', playPreview)
+  modalPreview.play()
+}
+
+function previewHandler() {
+  const currentTime = modalPreview.currentTime
+  const expired = currentTime >= timestamps[currentTimestampIndex].end
+  if (!expired) {
+    return
+  }
+  const lastIndex = currentTimestampIndex === timestamps.length - 1
+  if (lastIndex) {
+    modalPreview.pause()
+    previewOverlay.classList.remove('hidden')
+    playBtn.addEventListener('click', playPreview)
+  } else {
+    currentTimestampIndex += 1
+    modalPreview.currentTime = timestamps[currentTimestampIndex].start
+  }
 }
 

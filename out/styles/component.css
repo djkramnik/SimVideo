@@ -34,3 +34,48 @@
   left: 0;
   pointer-events: none;
 }
+
+#modal-container {
+  background-color: rgba(0, 0, 0, 0.8);
+  width: 100vw;
+  height: 100vh;
+  position: absolute;
+  top: 0px;
+  left: 0px;
+}
+
+#modal {
+  background-color: white;
+  margin: auto;
+  width: 800px;
+  height: 600px;
+  border-radius: 12px;
+}
+
+#modal-submit, #modal-cancel {
+  width: 200px;
+}
+
+#modal-submit {
+  background-color: orange;
+}
+
+#modal-cancel {
+  background-color: green;
+}
+
+#play-button {
+  margin: auto;
+  background: none;
+  outline: none;
+  border: 0;
+  cursor: pointer;
+}
+
+#preview-overlay {
+  background-color: white;
+}
+
+
+
+
