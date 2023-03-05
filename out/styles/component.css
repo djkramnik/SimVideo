@@ -6,6 +6,7 @@
   cursor: pointer;
   font-weight: bold;
   color: #fff;
+  font-size: 14px;
 }
 
 .list {
@@ -52,15 +53,21 @@
   border-radius: 12px;
 }
 
-#modal-submit, #modal-cancel {
+#modal-submit, #modal-cancel, #modal-download {
   width: 200px;
 }
 
-#modal-submit {
+#modal-download {
+  font-size: 14px;
+  text-decoration: none;
+}
+
+#modal-download,
+#modal-submit:not(.disabled) {
   background-color: orange;
 }
 
-#modal-cancel {
+#modal-cancel:not(.disabled) {
   background-color: green;
 }
 

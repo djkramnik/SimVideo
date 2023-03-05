@@ -23,6 +23,9 @@ const modalPreview = document.getElementById('modal-preview')
 const modalContainer = document.getElementById('modal-container')
 const modalSubmit = document.getElementById('modal-submit')
 const modalCancel = document.getElementById('modal-cancel')
+const modalDownload = document.getElementById('modal-download')
+const previewForm = document.getElementById('preview-form')
+const processedVideo = document.getElementById('processed')
 
 let uploadedFile = null
 let inFilename = ''
@@ -31,6 +34,7 @@ const timestamps = []
 const removeBtnsAndHandlers = []
 let currentTimestampIndex = -1
 
+previewForm.addEventListener('submit', submitPreview, false)
 modalCancel.addEventListener('click', cancelPreview, false)
 playBtn.addEventListener('click', playPreview, false)
 exportBtn.addEventListener('click', exportVideo, false)
@@ -214,7 +218,8 @@ async function exportVideo() {
   modalPreview.currentTime = timestamps[0].start
 }
 
-async function processVideo() {
+async function processVideo(target) {
+  let processedVideoUrl = null
   try {
     if (!ffmpeg.isLoaded()) {
       await ffmpeg.load();
@@ -237,13 +242,16 @@ async function processVideo() {
     await ffmpeg.run(...args);
 
     const data = ffmpeg.FS('readFile', outFilename);
-    video.src = URL.createObjectURL(new Blob([data.buffer], { type: 'video/mp4' }))
+    processedVideoUrl = URL.createObjectURL(new Blob([data.buffer], { type: 'video/mp4' }))
+    target.src = processedVideoUrl
+    return processedVideoUrl
   } catch(e) {
-    window.alert('could not export video')
+    window.alert('could not export video', e)
   } finally {
     exportBtn.disabled = false
     exportBtn.classList.remove('disabled')
   }
+  return processedVideoUrl
 }
 
 function addToTimestamps({start, end}) {
@@ -452,4 +460,26 @@ function cancelPreview() {
   modalContainer.classList.add('hidden')
   exportBtn.disabled = false
   exportBtn.classList.remove('disabled')
+  modalSubmit.classList.remove('disabled')
+  modalSubmit.classList.remove('hidden')
+  modalSubmit.disabled = false
+  modalDownload.classList.add('hidden')
+}
+
+async function submitPreview(event) {
+  event.preventDefault()
+  modalPreview.pause()
+  modalPreview.currentTime = timestamps[0].start
+  modalSubmit.classList.add('disabled')
+  modalCancel.classList.add('disabled')
+  modalSubmit.disabled = true
+  modalCancel.disabled = true
+  const videoUrl = await processVideo(processedVideo)
+  modalCancel.classList.remove('disabled')
+  modalCancel.disabled = false
+  modalSubmit.classList.add('hidden')
+  modalDownload.classList.remove('hidden')
+  modalDownload.href = videoUrl 
+  modalDownload.target = '_blank'
+  modalDownload.setAttribute('download', 'output.mp4')
 }
