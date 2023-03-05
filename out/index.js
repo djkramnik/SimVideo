@@ -21,6 +21,8 @@ const playBtn = document.getElementById('play-button')
 const previewOverlay = document.getElementById('preview-overlay')
 const modalPreview = document.getElementById('modal-preview')
 const modalContainer = document.getElementById('modal-container')
+const modalSubmit = document.getElementById('modal-submit')
+const modalCancel = document.getElementById('modal-cancel')
 
 let uploadedFile = null
 let inFilename = ''
@@ -29,6 +31,7 @@ const timestamps = []
 const removeBtnsAndHandlers = []
 let currentTimestampIndex = -1
 
+modalCancel.addEventListener('click', cancelPreview, false)
 playBtn.addEventListener('click', playPreview, false)
 exportBtn.addEventListener('click', exportVideo, false)
 clearBtn.addEventListener('click', clearForm, false)
@@ -49,7 +52,6 @@ toEnd.addEventListener('click', () => {
     endInput.value = video.duration
   }
 })
-
 video.addEventListener('timeupdate', () => {
   let showOverlay = false
   currentTime.innerHTML = video.currentTime
@@ -416,6 +418,7 @@ function playPreview() {
   previewOverlay.classList.add('hidden')
   modalPreview.addEventListener('timeupdate', previewHandler)
   playBtn.removeEventListener('click', playPreview)
+  currentTimestampIndex = 0
   modalPreview.play()
 }
 
@@ -425,14 +428,28 @@ function previewHandler() {
   if (!expired) {
     return
   }
+
   const lastIndex = currentTimestampIndex === timestamps.length - 1
   if (lastIndex) {
     modalPreview.pause()
     previewOverlay.classList.remove('hidden')
     playBtn.addEventListener('click', playPreview)
+    modalPreview.currentTime = 0
+    currentTimestampIndex = 0
   } else {
     currentTimestampIndex += 1
     modalPreview.currentTime = timestamps[currentTimestampIndex].start
   }
 }
 
+function cancelPreview() {
+  currentTimestampIndex = -1
+  modalPreview.removeEventListener('timeupdate', previewHandler)
+  previewOverlay.classList.remove('hidden')
+  playBtn.addEventListener('click', playPreview)
+  modalPreview.pause()
+  modalPreview.currentTime = timestamps[0].start
+  modalContainer.classList.add('hidden')
+  exportBtn.disabled = false
+  exportBtn.classList.remove('disabled')
+}

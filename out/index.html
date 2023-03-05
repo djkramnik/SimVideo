@@ -116,15 +116,15 @@
     </div>
     <div id="modal-container" class="flex hidden">
       <div id="modal" class="p-24">
-        <form class="container">
+        <form id="preview-form" class="container">
           <h3>Preview</h3>
           <div class="relative">
-            <div id="preview-overlay" class="absolute overlay flex" style="z-index:1">
+            <div id="preview-overlay" class="border absolute overlay flex" style="z-index:1">
               <button id="play-button" type="button">
                 <img src="/assets/play-button.png" />
               </button>
             </div>
-            <video id="modal-preview" class="video border"></video>
+            <video id="modal-preview" class="video"></video>
           </div>
           <div class="pv-30"></div>
           <div class="flex flex-dir-rr w-80 m-auto gap-15">
