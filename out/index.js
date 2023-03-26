@@ -26,6 +26,7 @@ const modalCancel = document.getElementById('modal-cancel')
 const modalDownload = document.getElementById('modal-download')
 const previewForm = document.getElementById('preview-form')
 const processedVideo = document.getElementById('processed')
+const body = document.body
 
 let uploadedFile = null
 let inFilename = ''
@@ -45,11 +46,13 @@ copyStart.addEventListener('click', () => {
   if (!startInput.disabled) {
     startInput.value = video.currentTime 
   }
+  video.pause()
 }, false)
 copyEnd.addEventListener('click', () => {
   if (!endInput.disabled) {
     endInput.value = video.currentTime 
   }
+  video.pause()
 }, false)
 toEnd.addEventListener('click', () => {
   if (!endInput.disabled) {
@@ -214,6 +217,9 @@ async function exportVideo() {
     return
   }
   modalContainer.classList.remove('hidden')
+  body.style.overflow = 'hidden'
+  body.scrollTop = 0
+  document.scrollTop = 0
   modalPreview.src = video.src
   modalPreview.currentTime = timestamps[0].start
 }
@@ -458,6 +464,7 @@ function cancelPreview() {
   modalPreview.pause()
   modalPreview.currentTime = timestamps[0].start
   modalContainer.classList.add('hidden')
+  body.style.overflow = 'auto'
   exportBtn.disabled = false
   exportBtn.classList.remove('disabled')
   modalSubmit.classList.remove('disabled')

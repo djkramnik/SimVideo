@@ -3,10 +3,19 @@
   <head>
     <meta charset="utf-8" />
     <title>Sim Video</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
     <link href="/styles/util.css" type="text/css" rel="stylesheet" />
     <link href="/styles/component.css" type="text/css" rel="stylesheet" />
+    <style>
+      * {
+        font-family: 'Open Sans', sans-serif;
+      }
+    </style>
   </head>
-  <body>
+  <body style="background-color: #eee">
     <header class="dark">
       <div class="container flex aic gap-15">
         <h2 class="inline-block mr-10">Sim Video</h2>
@@ -20,7 +29,14 @@
     <div class="page container">
       <div class="layout">
         <!-- video -->
-        <div class="flex flex-dir-col pv-30 bg-white">
+        <div class="flex flex-dir-col pv-30">
+          <input
+            id="file-upload"
+            class="button primary primary-hover"
+            type="file"
+            accept="video/*"
+          />
+          <hr class="separator" />
           <div class="video-container">
             <video class="video" id="video" controls></video>
             <div id="video-overlay" class="video-overlay"></div>
@@ -28,26 +44,20 @@
           <hr class="separator" />
           <div class="flex aic">
             <p id="current-time-container" class="m0 mr-10">
-              Current time:
+              <strong>Current time:</strong>
             </p>
             <p style="width: 80px" id="current-time-value" class="mr-40"></p>
             <button id="copy-start" class="mr-10">Copy to start</button>
             <button id="copy-end">Copy to end</button>
           </div>
-          <hr class="separator" />
-          <input
-            id="file-upload"
-            class="button primary primary-hover"
-            type="file"
-            accept="video/*"
-          />
         </div>
         <!-- timestamps -->
-        <div class="flex flex-dir-col pv-30 bg-white">
-          <div class="timestamp-container">
+        <div class="flex flex-dir-col pv-30">
+          <div class="timestamp-container bg-white">
             <div>
               <!-- <h3>Segments</h3> -->
-              <h4>Add new segment</h4>
+              <h4 class="header">Add new segment</h4>
+              <div class="separator"></div>
               <form id="timestamp-form" class="flex gap-15 flex-wrap">
                 <div class="form-control">
                   <label class="minw-140 inline-block" for="start"
@@ -97,8 +107,10 @@
                 </div>
               </form>
             </div>
+            <div class="separator">
+            </div>
             <div>
-              <h4>Segments</h4>
+              <h4 class="header">Segments</h4>
               <ul id="timestamp-list" class="list"></ul>
             </div>
             <div>
@@ -118,7 +130,7 @@
       <div id="modal" class="p-24">
         <form id="preview-form" class="container">
           <h3>Preview</h3>
-          <div class="relative">
+          <div class="relative video-container">
             <div id="preview-overlay" class="border absolute overlay flex" style="z-index:1">
               <button id="play-button" type="button">
                 <img src="/assets/play-button.png" />
